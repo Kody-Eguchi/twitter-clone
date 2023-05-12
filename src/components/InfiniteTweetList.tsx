@@ -23,7 +23,7 @@ type Tweet = {
 type InfiniteTweetListProps = {
   isLoading: boolean
   isError: boolean
-  hasMore: boolean
+  hasMore: boolean | undefined
   fetchNewTweets: () => Promise<unknown>
   tweets?: Tweet[]
 }
@@ -41,7 +41,7 @@ export default function InfiniteTweetList({ tweets, isError, isLoading, fetchNew
       <InfiniteScroll
         dataLength={tweets.length}
         next={fetchNewTweets}
-        hasMore={hasMore}
+        hasMore={hasMore || false}
         loader={"Loading..."}
       >
           {tweets.map(tweet => {
@@ -74,6 +74,7 @@ function TweetCard({id, user, content, createdAt, likeCount, likedByMe}: Tweet) 
                 if (tweet.id === id) {
                   return {
                     ...tweet,
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/restrict-plus-operands
                     likeCount: tweet.likeCount + countModifier,
                     likedByMe: addedLike,
                   };

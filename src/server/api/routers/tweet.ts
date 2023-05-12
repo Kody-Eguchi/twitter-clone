@@ -42,8 +42,11 @@ export const tweetRouter = createTRPCRouter({
         id: tweet.id,
         content: tweet.content,
         createdAt: tweet.createdAt,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         likeCount: tweet._count.likes,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         user: tweet.user,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         likedByMe: tweet.likes?.length > 0,
       }
     }), nextCursor}
