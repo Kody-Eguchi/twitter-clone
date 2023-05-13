@@ -10,6 +10,22 @@ import {
 } from "~/server/api/trpc";
 
 export const tweetRouter = createTRPCRouter({
+  infiniteProfileFeed: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        limit: z.number().optional(),
+        cursor: z.object({ id: z.string(), createdAt: z.date() }).optional(),
+      })
+    )
+    .query(async ({ input: { limit = 10, userId, cursor }, ctx }) => {
+      return await getInfiniteTweets({
+        limit,
+        ctx,
+        cursor,
+        whereClause: { userId },
+      });
+    }),
   infiniteFeed: publicProcedure.input(z.object({
     onlyFollowing: z.boolean().optional(),
     limit: z.number().optional(),
@@ -36,6 +52,8 @@ export const tweetRouter = createTRPCRouter({
   .input(z.object({ content: z.string() }))
   .mutation(async ({ input: { content }, ctx}) => {
     const tweet = await ctx.prisma.tweet.create({ data: {content, userId: ctx.session.user.id}})
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    void ctx.revalidateSSG?.(`/profiles/${ctx.session.user.id}`)
     return tweet
   }),
   toggleLike: protectedProcedure
